@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz do Corinthians</title>
+    <link rel="stylesheet" href="quiz.css">
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>Quiz do Corinthians</h1>
+    <div class="pergunta" id="pergunta"></div>
+    <div class="alternativas">
+        <label><input type="radio" name="alternativa" id="alternativaA" value="alternativaA"> <span id="respostaA"></span></label>
+        <label><input type="radio" name="alternativa" id="alternativaB" value="alternativaB"> <span id="respostaB"></span></label>
+        <label><input type="radio" name="alternativa" id="alternativaC" value="alternativaC"> <span id="respostaC"></span></label>
+        <label><input type="radio" name="alternativa" id="alternativaD" value="alternativaD"> <span id="respostaD"></span></label>
+    </div>
+    <div class="navegacao">
+        <button id="voltar" onclick="voltar()">Voltar</button>
+        <button id="proxima" onclick="proxima()">Próxima</button>
+        <button id="concluir" onclick="concluir()" style="display: none;">Concluir</button>
+    </div>
+</div>
+
+<script>
+    const listaDeQuestoes = [
+        { pergunta: "Em que ano o Corinthians foi fundado?", alternativaA: "1910", alternativaB: "1920", alternativaC: "1908", alternativaD: "1914", alternativaCorreta: "alternativaA" },
+        { pergunta: "Qual é o mascote oficial do Corinthians?", alternativaA: "Urubu", alternativaB: "Gavião", alternativaC: "Leão", alternativaD: "Tigre", alternativaCorreta: "alternativaB" },
+        { pergunta: "Quantas vezes o Corinthians venceu a Libertadores?", alternativaA: "1", alternativaB: "2", alternativaC: "3", alternativaD: "4", alternativaCorreta: "alternativaA" },
+        { pergunta: "Quem foi o técnico do título mundial de 2012?", alternativaA: "Tite", alternativaB: "Mano Menezes", alternativaC: "Luxemburgo", alternativaD: "Carille", alternativaCorreta: "alternativaA" },
+        { pergunta: "Qual é o estádio do Corinthians?", alternativaA: "Maracanã", alternativaB: "Morumbi", alternativaC: "Arena Corinthians", alternativaD: "Pacaembu", alternativaCorreta: "alternativaC" },
+        { pergunta: "Quem é o maior artilheiro da história do Corinthians?", alternativaA: "Sócrates", alternativaB: "Marcelinho Carioca", alternativaC: "Cláudio", alternativaD: "Rivellino", alternativaCorreta: "alternativaC" },
+        { pergunta: "Quantos títulos brasileiros o Corinthians possui?", alternativaA: "6", alternativaB: "7", alternativaC: "8", alternativaD: "9", alternativaCorreta: "alternativaB" },
+        { pergunta: "Em que ano o Corinthians ganhou seu primeiro Mundial?", alternativaA: "2000", alternativaB: "2012", alternativaC: "2010", alternativaD: "1999", alternativaCorreta: "alternativaA" },
+        { pergunta: "Quem é conhecido como o 'Pé de Anjo' no Corinthians?", alternativaA: "Ronaldo", alternativaB: "Neto", alternativaC: "Marcelinho Carioca", alternativaD: "Casagrande", alternativaCorreta: "alternativaC" },
+        { pergunta: "Qual é a torcida organizada mais famosa do Corinthians?", alternativaA: "Gaviões da Fiel", alternativaB: "Mancha Verde", alternativaC: "Força Jovem", alternativaD: "Torcida Independente", alternativaCorreta: "alternativaA" }
+    ];
+
+    let indiceAtual = 0;
+    let respostasSelecionadas = [];
+
+    function carregarPergunta() {
+        const pergunta = listaDeQuestoes[indiceAtual];
+        document.getElementById("pergunta").textContent = pergunta.pergunta;
+        document.getElementById("respostaA").textContent = pergunta.alternativaA;
+        document.getElementById("respostaB").textContent = pergunta.alternativaB;
+        document.getElementById("respostaC").textContent = pergunta.alternativaC;
+        document.getElementById("respostaD").textContent = pergunta.alternativaD;
+
+        // Restaurar a seleção anterior
+        const alternativaSelecionada = respostasSelecionadas[indiceAtual];
+        if (alternativaSelecionada) {
+            document.getElementById(alternativaSelecionada).checked = true;
+        } else {
+            const alternativas = document.getElementsByName("alternativa");
+            alternativas.forEach(alt => alt.checked = false);
+        }
+
+        document.getElementById("voltar").disabled = indiceAtual === 0;
+        verificarConclusao();
+    }
+
+    function marcarResposta() {
+        const alternativas = document.getElementsByName("alternativa");
+        for (const alternativa of alternativas) {
+            if (alternativa.checked) {
+                respostasSelecionadas[indiceAtual] = alternativa.id;
+                break;
+            }
+        }
+    }
+
+    function proxima() {
+        marcarResposta();
+        if (indiceAtual < listaDeQuestoes.length - 1) {
+            indiceAtual++;
+            carregarPergunta();
+        }
+    }
+
+    function voltar() {
+        marcarResposta();
+        if (indiceAtual > 0) {
+            indiceAtual--;
+            carregarPergunta();
+        }
+    }
+
+    function verificarConclusao() {
+        if (indiceAtual === listaDeQuestoes.length - 1) {
+            document.getElementById("proxima").style.display = "none";
+            document.getElementById("concluir").style.display = "inline";
+        } else {
+            document.getElementById("proxima").style.display = "inline";
+            document.getElementById("concluir").style.display = "none";
+        }
+    }
+
+    function concluir() {
+        marcarResposta();
+        const acertos = listaDeQuestoes.reduce((total, questao, index) => {
+            return total + (respostasSelecionadas[index] === questao.alternativaCorreta ? 1 : 0);
+        }, 0);
+        alert(`Quiz concluído! Você acertou ${acertos} de ${listaDeQuestoes.length} perguntas.`);
+    }
+
+    carregarPergunta();
+</script>
+
+</body>
+</html>
